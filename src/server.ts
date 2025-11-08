@@ -1,17 +1,15 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import dotenv from 'dotenv';
 import http from 'node:http';
+import { styleText as style } from 'node:util';
+import { usersRouter } from './router/usersRouter';
 
 dotenv.config();
 
-const DEF_PORT = 3000;
+const { BASE_PORT } = process.env;
+const PORT = Number(BASE_PORT || 3000);
 const HOSTNAME = 'localhost';
-const PORT = Number(process.env.BASE_PORT) || DEF_PORT;
 
-const server = http.createServer((req, resp) => {
-  console.log(req.method, req.url);
-  resp.end(`${req.method}${req.url}`);
-});
-
-server.listen(PORT, HOSTNAME, () => {
-  console.log(`Server running at http://${HOSTNAME}:${PORT}/`);
+http.createServer(usersRouter).listen(PORT, HOSTNAME, () => {
+  console.log(style('cyan', `\n✅ Server running at http://${HOSTNAME}:${PORT}\n`));
 });
