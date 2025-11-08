@@ -1,7 +1,14 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { ErrorMessage, HttpStatusCode } from './constants';
+import { ErrorMessage, HttpStatusCode, RE_UUID } from '../constants';
 
-const RE_VALID_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+type NodeJSError = Error & {
+  errno?: number;
+  code?: string;
+  syscall?: string;
+  path?: string;
+  address?: string;
+  port?: number;
+};
 
 export const getRequestBody = async (
   req: IncomingMessage,
@@ -38,7 +45,7 @@ export const JSONParse = (s: string): unknown => {
 };
 
 export const isValidUUID = (id: string): boolean => {
-  return RE_VALID_UUID.test(id);
+  return RE_UUID.test(id);
 };
 
 export const isObject = (obj: unknown): obj is Record<string, unknown> => {
@@ -62,4 +69,8 @@ export const getErrorMessage = (
 
 export const removeDups = <T>(arr: T[]): T[] => {
   return [...new Set(arr)];
+};
+
+export const isNodeJSError = (err: unknown): err is NodeJSError => {
+  return err instanceof Error;
 };

@@ -1,3 +1,6 @@
+export const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const DEF_SERVER_PORT = 3000;
+
 export const ErrorMessage = {
   SomethingWrong: 'something went wrong',
   InvalidUUID: 'invalid ID',
