@@ -4,13 +4,13 @@ import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import prettierConfig from './prettier.config.js';
+import prettierConfig from './prettier.config.mjs';
 
 const ECMA_VERSION = 2020;
 const MAX_LINES_PER_FUNCTION = 120;
 
 export default defineConfig({
-  ignores: ['*.js', '**/dist/**'],
+  ignores: ['*.{mjs,js}', '**/dist/**'],
   languageOptions: {
     sourceType: 'module',
     parser: tsParser,
@@ -63,8 +63,9 @@ export default defineConfig({
       },
     ],
     '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-misused-spread': 'off',
-    '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+    '@typescript-eslint/consistent-type-assertions': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],

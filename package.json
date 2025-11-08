@@ -1,12 +1,13 @@
 {
   "name": "rs-node-crud-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple CRUD API server",
   "main": "src/server.ts",
   "scripts": {
     "build": "tsc",
     "start:dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
     "start:prod": "npm run build && node dist/server.js",
+    "start": "npm run start:dev",
     "test": "jest",
     "prepare": "husky",
     "format": "npx prettier . --check --ignore-unknown",
@@ -21,7 +22,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/dusixx/rs-node-crud-api/issues"
   },
@@ -36,6 +36,7 @@
     "@commitlint/config-conventional": "^20.0.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
+    "@tsconfig/recommended": "^1.0.11",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
@@ -50,6 +51,8 @@
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3"
   },
