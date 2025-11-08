@@ -59,3 +59,7 @@ export const getErrorMessage = (
 ): string => {
   return err instanceof Error ? err.message : isStr(err) ? err : defaultMessage;
 };
+
+export const removeDups = <T>(arr: T[]): T[] => {
+  return [...new Set(arr)];
+};

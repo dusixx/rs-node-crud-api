@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { getRequestBody, JSONParse, sendJSON } from '../common/utils';
+import { getRequestBody, JSONParse, removeDups, sendJSON } from '../common/utils';
 import type { User } from '../db/users';
 import { users } from '../db/users';
 import { ValidateError, validateUserCreate } from './utils/validate';
@@ -14,6 +14,7 @@ export const createUser = async (
     const validData = validateUserCreate(data);
     const id = crypto.randomUUID();
     const created = { id, ...validData };
+    created.hobbies = removeDups(created.hobbies.map(v => v.toLocaleLowerCase()));
     users.set(id, created);
 
     sendJSON(resp, 'Created', { data: created });

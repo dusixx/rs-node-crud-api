@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { ErrorMessage } from '../common/constants';
-import { getRequestBody, isValidUUID, JSONParse, sendJSON } from '../common/utils';
+import { getRequestBody, isValidUUID, JSONParse, removeDups, sendJSON } from '../common/utils';
 import { users } from '../db/users';
 import { ValidateError, validateUserUpdate } from './utils/validate';
 
@@ -22,18 +22,13 @@ export const updateUserById = async (
   try {
     const validData = validateUserUpdate(data);
     if (!validData) {
-      sendJSON(resp, 'BadRequest', { error: `empty request body` });
+      sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidRequestBody });
       return;
     }
     const exsisting = users.get(id)!;
-    const { hobbies: oldHobbies, id: _, ...oldRest } = exsisting;
-    const { hobbies: newHobbies = [], ...newRest } = validData;
-    const updated = {
-      ...oldRest,
-      ...newRest,
-      hobbies: [...new Set(oldHobbies.concat(newHobbies))],
-    };
-    users.set(id, { id, ...updated });
+    const updated = { ...exsisting, ...validData };
+    updated.hobbies = removeDups(updated.hobbies.map(v => v.toLocaleLowerCase()));
+    users.set(id, { ...updated });
 
     sendJSON(resp, 'OK', { data: updated });
   } catch (err) {

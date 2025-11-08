@@ -1,9 +1,10 @@
 export const ErrorMessage = {
   SomethingWrong: 'something went wrong',
   InvalidUUID: 'invalid ID',
-  UserNotFound: 'user with this ID not found',
+  UserNotFound: 'user with such ID not found',
   UnknownRoute: 'unknown route',
   UnknownMethod: 'unknown method',
+  InvalidRequestBody: 'invalid request body',
 } as const;
 
 export const HttpMethod = {

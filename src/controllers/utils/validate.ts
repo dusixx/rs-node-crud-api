@@ -1,8 +1,9 @@
+import { ErrorMessage } from '../../common/constants';
 import { hasOwnKeys, isObject, isStr } from '../../common/utils';
 import type { UserCreate, UserUpdate } from '../../db/users';
 
-const MIN_AGE = 18;
-const MAX_AGE = 120;
+const MIN_AGE = 16;
+const MAX_AGE = 75;
 const RE_VALID_NAME = /^[a-z][a-z0-9]+$/i;
 
 type Validator = {
@@ -29,36 +30,36 @@ const ValidUserProp: Record<keyof UserCreate, Validator> = {
 
 export function validateUserCreate(data: unknown): UserCreate {
   if (!isObject(data)) {
-    throw new ValidateError('invalid user shape');
+    throw new ValidateError(ErrorMessage.InvalidRequestBody);
   }
-  return Object.entries(ValidUserProp).reduce<Record<string, unknown>>(
-    (res, [key, { validate, error }]) => {
-      if (!hasOwnKeys(data, key)) {
-        throw new ValidateError(`${key}: is required`);
-      }
-      if (!validate(data[key])) {
-        throw new ValidateError(error);
-      }
-      res[key] = data[key];
-
-      return res;
-    },
-    {},
-  ) as UserCreate;
+  const validEntries = Object.entries(ValidUserProp).map(([key, { validate, error }]) => {
+    if (!hasOwnKeys(data, key)) {
+      throw new ValidateError(`${key}: is required`);
+    }
+    if (!validate(data[key])) {
+      throw new ValidateError(error);
+    }
+    return [key, data[key]];
+  });
+  return Object.fromEntries(validEntries) as UserCreate;
 }
 
 export const validateUserUpdate = (data: unknown): UserUpdate | null => {
   if (!isObject(data)) {
     return null;
   }
-  const validProps = Object.entries(ValidUserProp).filter(([key, { validate, error }]) => {
-    if (!hasOwnKeys(data, key)) {
-      return false;
-    }
-    if (!validate(data[key])) {
-      throw new ValidateError(error);
-    }
-    return true;
-  });
-  return validProps.length ? Object.fromEntries(validProps) : null;
+  const validEntries = Object.entries(ValidUserProp).reduce<[string, unknown][]>(
+    (res, [key, { validate, error }]) => {
+      if (!hasOwnKeys(data, key)) {
+        return res;
+      }
+      if (!validate(data[key])) {
+        throw new ValidateError(error);
+      }
+      res.push([key, data[key]]);
+      return res;
+    },
+    [],
+  );
+  return Object.fromEntries(validEntries);
 };
