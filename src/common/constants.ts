@@ -1,5 +1,5 @@
-export const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const DEF_SERVER_PORT = 3000;
+export const DEF_HOSTANME = 'localhost';
 
 export const ErrorMessage = {
   SomethingWrong: 'something went wrong',
@@ -25,4 +25,5 @@ export const HttpStatusCode = {
   NotFound: 404,
   MethodNotAllowed: 405,
   InternalServerError: 500,
+  BadGateway: 502,
 } as const;

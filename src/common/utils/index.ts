@@ -1,5 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { ErrorMessage, HttpStatusCode, RE_UUID } from '../constants';
+import { ErrorMessage, HttpStatusCode } from '../constants';
+
+export const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type NodeJSError = Error & {
   errno?: number;
@@ -31,9 +33,12 @@ export const sendJSON = (
   resp: ServerResponse,
   statusCode: keyof typeof HttpStatusCode,
   body: unknown,
-): void => {
-  resp.writeHead(HttpStatusCode[statusCode], { 'content-type': 'application/json' });
+): number => {
+  const code = HttpStatusCode[statusCode];
+  resp.writeHead(code, { 'content-type': 'application/json' });
   resp.end(JSON.stringify(body));
+
+  return code;
 };
 
 export const JSONParse = (s: string): unknown => {
