@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { styleText as style } from 'node:util';
 import { ErrorMessage, HttpMethod } from '../common/constants';
 import { getErrorMessage, sendJSON } from '../common/utils';
+import { stylizeHttpStatus } from '../common/utils/style';
 import {
   createUser,
   deleteUserById,
@@ -22,7 +23,9 @@ const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise
       return id ? getUserById(resp, id) : getAllUsers(resp);
 
     case HttpMethod.DELETE:
-      return deleteUserById(resp, id);
+      return id
+        ? deleteUserById(resp, id)
+        : sendJSON(resp, 'BadRequest', { error: ErrorMessage.IDNorSpecified });
 
     case HttpMethod.POST:
       return id
@@ -30,7 +33,9 @@ const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise
         : await createUser(req, resp);
 
     case HttpMethod.PUT:
-      return await updateUserById(req, resp, id);
+      return id
+        ? await updateUserById(req, resp, id)
+        : sendJSON(resp, 'BadRequest', { error: ErrorMessage.IDNorSpecified });
 
     default:
       return sendJSON(resp, 'MethodNotAllowed', { error: ErrorMessage.UnknownMethod });
@@ -40,7 +45,7 @@ const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise
 export const usersRouter: typeof _usersRouter = async (req, resp) => {
   try {
     const result = await _usersRouter(req, resp);
-    console.log(result, req.method?.toUpperCase(), req.url);
+    console.log(stylizeHttpStatus(result), req.method?.toUpperCase(), req.url);
     return result;
   } catch (err) {
     console.log('error:', style('red', getErrorMessage(err)));
