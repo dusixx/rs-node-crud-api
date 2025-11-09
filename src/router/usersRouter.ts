@@ -10,49 +10,40 @@ import {
   updateUserById,
 } from '../controllers';
 
-const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise<void> => {
+const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise<number> => {
   const { method, url = '' } = req;
   const [base = '', path = '', id = '', extra = ''] = url.slice(1).split('/');
 
   if (extra || !/^api$/i.test(base) || !/^users$/i.test(path)) {
-    sendJSON(resp, 'NotFound', { error: ErrorMessage.UnknownRoute });
-    return;
+    return sendJSON(resp, 'NotFound', { error: ErrorMessage.UnknownRoute });
   }
   switch (method) {
     case HttpMethod.GET:
-      if (!id) {
-        getAllUsers(resp);
-      } else {
-        getUserById(resp, id);
-      }
-      return;
+      return id ? getUserById(resp, id) : getAllUsers(resp);
 
     case HttpMethod.DELETE:
-      deleteUserById(resp, id);
-      return;
+      return deleteUserById(resp, id);
 
     case HttpMethod.POST:
-      if (id) {
-        sendJSON(resp, 'NotFound', { error: ErrorMessage.UnknownRoute });
-        return;
-      }
-      await createUser(req, resp);
-      return;
+      return id
+        ? sendJSON(resp, 'NotFound', { error: ErrorMessage.UnknownRoute })
+        : await createUser(req, resp);
 
     case HttpMethod.PUT:
-      await updateUserById(req, resp, id);
-      return;
+      return await updateUserById(req, resp, id);
 
     default:
-      sendJSON(resp, 'MethodNotAllowed', { error: ErrorMessage.UnknownMethod });
+      return sendJSON(resp, 'MethodNotAllowed', { error: ErrorMessage.UnknownMethod });
   }
 };
 
 export const usersRouter: typeof _usersRouter = async (req, resp) => {
   try {
-    await _usersRouter(req, resp);
+    const result = await _usersRouter(req, resp);
+    console.log(result, req.method?.toUpperCase(), req.url);
+    return result;
   } catch (err) {
     console.log('error:', style('red', getErrorMessage(err)));
-    sendJSON(resp, 'InternalServerError', { error: ErrorMessage.SomethingWrong });
+    return sendJSON(resp, 'InternalServerError', { error: ErrorMessage.SomethingWrong });
   }
 };
