@@ -7,6 +7,7 @@
     "build": "tsc",
     "start:dev": "nodemon --watch src --ext ts --exec ts-node src/server/server.ts",
     "start:prod": "npm run build && node dist/server/server.js",
+    "start:multi": "nodemon --watch src --ext ts --exec ts-node src/server/balancer.ts",
     "start": "npm run start:dev",
     "test": "jest",
     "coverage": "jest --coverage",
