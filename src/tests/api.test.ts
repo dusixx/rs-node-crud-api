@@ -13,11 +13,7 @@ import { createUser, getPath, mockUserCreate, mockUserUpdate } from './test-util
 let server: Server;
 
 beforeAll(async () => {
-  server = await startHttpServer({
-    port: 0,
-    requestListener: usersRouter,
-    killExists: true,
-  });
+  server = await startHttpServer({ port: 0, hostname: '' }, usersRouter);
 });
 afterAll(() => {
   server.close();
@@ -175,8 +171,7 @@ describe('CRUD API tests', () => {
     it('should delete existing user', async () => {
       const user = createUser();
       const resp = await request(server).delete(getPath(user.id));
-      expect(resp.statusCode).toBe(HttpStatusCode.OK);
-      expect(resp.body).toHaveProperty('id', user.id);
+      expect(resp.statusCode).toBe(HttpStatusCode.NoContent);
       expect(users.has(user.id)).toBeFalsy();
     });
 
