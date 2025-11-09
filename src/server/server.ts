@@ -11,6 +11,6 @@ const { BASE_PORT } = process.env;
 const port = Number(BASE_PORT || DEF_SERVER_PORT);
 const hostname = 'localhost';
 
-void startServer({ port, hostname, requestListener: usersRouter }, () => {
+void startServer({ port, hostname, requestListener: usersRouter, killExists: true }, () => {
   console.log(style('cyan', `\n🚀 Server running at http://${hostname}:${port}\n`));
 });
