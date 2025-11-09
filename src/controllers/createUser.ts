@@ -17,7 +17,7 @@ export const createUser = async (
     created.hobbies = removeDups(created.hobbies.map(v => v.toLocaleLowerCase()));
     users.set(id, created);
 
-    sendJSON(resp, 'Created', { data: created });
+    sendJSON(resp, 'Created', created);
   } catch (err) {
     if (err instanceof ValidateError) {
       sendJSON(resp, 'BadRequest', { error: err.message });

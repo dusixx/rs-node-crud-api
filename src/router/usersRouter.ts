@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { styleText as style } from 'node:util';
 import { ErrorMessage, HttpMethod } from '../common/constants';
-import { sendJSON } from '../common/utils';
+import { getErrorMessage, sendJSON } from '../common/utils';
 import {
   createUser,
   deleteUserById,
@@ -51,7 +52,7 @@ export const usersRouter: typeof _usersRouter = async (req, resp) => {
   try {
     await _usersRouter(req, resp);
   } catch (err) {
-    console.log(err);
+    console.log('error:', style('red', getErrorMessage(err)));
     sendJSON(resp, 'InternalServerError', { error: ErrorMessage.SomethingWrong });
   }
 };

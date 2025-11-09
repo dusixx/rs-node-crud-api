@@ -30,7 +30,7 @@ export const updateUserById = async (
     updated.hobbies = removeDups(updated.hobbies.map(v => v.toLocaleLowerCase()));
     users.set(id, { ...updated });
 
-    sendJSON(resp, 'OK', { data: updated });
+    sendJSON(resp, 'OK', updated);
   } catch (err) {
     if (err instanceof ValidateError) {
       sendJSON(resp, 'BadRequest', { error: err.message });

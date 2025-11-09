@@ -13,7 +13,7 @@ type Validator = {
 
 export class ValidateError extends Error {}
 
-const ValidUserProp: Record<keyof UserCreate, Validator> = {
+export const ValidUserProp: Record<keyof UserCreate, Validator> = {
   username: {
     validate: v => isStr(v) && RE_VALID_NAME.test(v),
     error: `username: string: allowed [a-z0-9], first letter, at least 2 characters long`,

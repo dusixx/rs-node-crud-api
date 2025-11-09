@@ -12,5 +12,5 @@ export const getUserById = (resp: ServerResponse, id: string): void => {
     sendJSON(resp, 'NotFound', { error: ErrorMessage.UserNotFound });
     return;
   }
-  sendJSON(resp, 'OK', { data: users.get(id) });
+  sendJSON(resp, 'OK', users.get(id));
 };

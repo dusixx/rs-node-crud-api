@@ -14,5 +14,5 @@ export const deleteUserById = (resp: ServerResponse, id: string): void => {
   }
   const deleted = users.get(id);
   users.delete(id);
-  sendJSON(resp, 'OK', { data: deleted });
+  sendJSON(resp, 'OK', deleted);
 };
