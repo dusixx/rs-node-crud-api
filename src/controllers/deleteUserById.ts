@@ -3,16 +3,14 @@ import { ErrorMessage } from '../common/constants';
 import { isValidUUID, sendJSON } from '../common/utils';
 import { users } from '../db/users';
 
-export const deleteUserById = (resp: ServerResponse, id: string): void => {
+export const deleteUserById = (resp: ServerResponse, id: string): number => {
   if (!isValidUUID(id)) {
-    sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidUUID });
-    return;
+    return sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidUUID });
   }
   if (!users.has(id)) {
-    sendJSON(resp, 'NotFound', { error: ErrorMessage.UserNotFound });
-    return;
+    return sendJSON(resp, 'NotFound', { error: ErrorMessage.UserNotFound });
   }
   const deleted = users.get(id);
   users.delete(id);
-  sendJSON(resp, 'OK', deleted);
+  return sendJSON(resp, 'OK', deleted);
 };

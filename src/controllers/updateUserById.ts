@@ -8,33 +8,29 @@ export const updateUserById = async (
   req: IncomingMessage,
   resp: ServerResponse,
   id: string,
-): Promise<void> => {
+): Promise<number> => {
   if (!isValidUUID(id)) {
-    sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidUUID });
-    return;
+    return sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidUUID });
   }
   if (!users.has(id)) {
-    sendJSON(resp, 'NotFound', { error: ErrorMessage.UserNotFound });
-    return;
+    return sendJSON(resp, 'NotFound', { error: ErrorMessage.UserNotFound });
   }
   const body = await getRequestBody(req);
   const data = JSONParse(body);
   try {
     const validData = validateUserUpdate(data);
     if (!validData) {
-      sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidRequestBody });
-      return;
+      return sendJSON(resp, 'BadRequest', { error: ErrorMessage.InvalidRequestBody });
     }
     const exsisting = users.get(id)!;
     const updated = { ...exsisting, ...validData };
     updated.hobbies = removeDups(updated.hobbies.map(v => v.toLocaleLowerCase()));
     users.set(id, { ...updated });
 
-    sendJSON(resp, 'OK', updated);
+    return sendJSON(resp, 'OK', updated);
   } catch (err) {
     if (err instanceof ValidateError) {
-      sendJSON(resp, 'BadRequest', { error: err.message });
-      return;
+      return sendJSON(resp, 'BadRequest', { error: err.message });
     }
     throw err;
   }
