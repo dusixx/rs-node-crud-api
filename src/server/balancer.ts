@@ -1,6 +1,5 @@
 import cluster from 'cluster';
-import { getErrorMessage } from '../common/utils';
-import { red } from '../common/utils/style';
+import { showError } from '../common/utils';
 import { balancerFlow, workerFlow } from './balancer.utils';
 
 void (async (): Promise<void> => {
@@ -11,6 +10,6 @@ void (async (): Promise<void> => {
       await workerFlow();
     }
   } catch (err) {
-    console.log(red('error:'), getErrorMessage(err));
+    showError(err);
   }
 })();

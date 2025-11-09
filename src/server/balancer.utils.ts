@@ -2,9 +2,10 @@
 import cluster from 'cluster';
 import dotenv from 'dotenv';
 import os from 'os';
+import { redirectRequestToService } from '../common/utils';
 import { cyan, gray, yellow } from '../common/utils/style';
 import { usersRouter } from '../router/usersRouter';
-import { redirectRequestToService, startHttpServer } from './server.utils';
+import { startHttpServer } from './server.utils';
 
 dotenv.config({ quiet: true });
 
@@ -16,32 +17,27 @@ const workersCount = os.availableParallelism() - 1;
 let currentWorkerId = 0;
 
 export const balancerFlow = async (): Promise<void> => {
-  await startHttpServer({ port: basePort, requestListener: usersRouter });
+  await startHttpServer({ port: basePort }, usersRouter);
 
   for (let i = 0; i < workersCount; i += 1) {
     cluster.fork({ WORKER_PORT: balancerPort + i + 1 });
   }
-  await startHttpServer({
-    port: balancerPort,
-    requestListener: async (req, resp) => {
-      currentWorkerId = (currentWorkerId % workersCount) + 1;
-      const currentWorkerPort = balancerPort + currentWorkerId;
+  await startHttpServer({ port: balancerPort }, async (req, resp) => {
+    currentWorkerId = (currentWorkerId % workersCount) + 1;
+    const currentWorkerPort = balancerPort + currentWorkerId;
 
-      console.log(gray(`Redirect request to http://${hostname}:${currentWorkerPort}`));
-      await redirectRequestToService(req, resp, currentWorkerPort);
-    },
+    console.log(gray(`Redirect request to http://${hostname}[:${currentWorkerPort}]`));
+    await redirectRequestToService(req, resp, currentWorkerPort);
   });
-  console.log(cyan(`\n🚀 Balancer running at http://${hostname}:${balancerPort}`));
-  console.log(yellow('Launch workers...\n'));
+  console.clear();
+  console.log(cyan(`\n🚀 Balancer running at http://${hostname}[:${balancerPort}]`));
+  console.log(yellow(`\nLaunch ${workersCount} worker(s)...`));
 };
 
 export const workerFlow = async (): Promise<void> => {
   const port = Number(process.env.WORKER_PORT);
-  await startHttpServer({
-    port,
-    requestListener: async (req, resp) => {
-      await redirectRequestToService(req, resp, basePort);
-    },
+  await startHttpServer({ port }, async (req, resp) => {
+    await redirectRequestToService(req, resp, basePort);
   });
   console.log(`Worker running at http://${hostname}:${port}`);
 };

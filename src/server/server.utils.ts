@@ -1,15 +1,8 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { exec } from 'node:child_process';
-import type {
-  IncomingMessage,
-  RequestListener,
-  RequestOptions,
-  Server,
-  ServerResponse,
-} from 'node:http';
-import http, { request } from 'node:http';
+import type { RequestListener, Server } from 'node:http';
+import http from 'node:http';
 import { promisify } from 'node:util';
-import { DEF_HOSTANME, HttpStatusCode } from '../common/constants';
 import { isNodeJSError } from '../common/utils';
 
 const execAsync = promisify(exec);
@@ -43,20 +36,21 @@ export const killServer = async (port: number): Promise<void> => {
 type startHttpServerProps = {
   port: number;
   hostname?: string;
-  requestListener?: RequestListener;
   killExists?: boolean;
   connectionTimeout?: number;
   retryDelay?: number;
 };
 
-export const startHttpServer = async ({
-  port,
-  hostname = 'localhost',
-  requestListener,
-  killExists = true,
-  connectionTimeout = 10_000,
-  retryDelay = 1_000,
-}: startHttpServerProps): Promise<Server> => {
+export const startHttpServer = async (
+  {
+    port,
+    hostname = 'localhost',
+    killExists = true,
+    connectionTimeout = 10_000,
+    retryDelay = 1_000,
+  }: startHttpServerProps,
+  requestListener?: RequestListener,
+): Promise<Server> => {
   let elapsed = 0;
   const server = http.createServer(requestListener);
 
@@ -85,33 +79,5 @@ export const startHttpServer = async ({
       resolve(server);
     });
     server.listen(port, hostname);
-  });
-};
-
-export const redirectRequestToService = async (
-  req: IncomingMessage,
-  resp: ServerResponse,
-  port: number | string,
-  hostname: string = DEF_HOSTANME,
-): Promise<void> => {
-  await new Promise((resolve, reject) => {
-    const requestOptions: RequestOptions = {
-      hostname,
-      port,
-      path: req.url,
-      method: req.method,
-      headers: req.headers,
-    };
-    const serviceRequest = request(requestOptions, serviceResponse => {
-      serviceResponse.on('end', resolve);
-      serviceResponse.on('error', reject);
-      resp.writeHead(
-        serviceResponse.statusCode ?? HttpStatusCode.InternalServerError,
-        serviceResponse.headers,
-      );
-      serviceResponse.pipe(resp);
-    });
-    serviceRequest.on('error', reject);
-    req.pipe(serviceRequest);
   });
 };
