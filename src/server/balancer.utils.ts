@@ -19,9 +19,9 @@ let currentWorkerId = 0;
 export const balancerFlow = async (): Promise<void> => {
   await startHttpServer({ port: basePort }, usersRouter);
 
-  for (let i = 0; i < workersCount; i += 1) {
-    cluster.fork({ WORKER_PORT: balancerPort + i + 1 });
-  }
+  Array.from({ length: workersCount }).forEach((_, i) =>
+    cluster.fork({ WORKER_PORT: balancerPort + i + 1 }),
+  );
   await startHttpServer({ port: balancerPort }, async (req, resp) => {
     currentWorkerId = (currentWorkerId % workersCount) + 1;
     const currentWorkerPort = balancerPort + currentWorkerId;

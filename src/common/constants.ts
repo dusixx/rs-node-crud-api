@@ -1,4 +1,3 @@
-export const DEF_SERVER_PORT = 3000;
 export const DEF_HOSTANME = 'localhost';
 
 export const ErrorMessage = {
