@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { exec } from 'node:child_process';
-import type { RequestListener, Server } from 'node:http';
-import http from 'node:http';
+import type {
+  IncomingMessage,
+  RequestListener,
+  RequestOptions,
+  Server,
+  ServerResponse,
+} from 'node:http';
+import http, { request } from 'node:http';
 import { promisify } from 'node:util';
+import { DEF_HOSTANME, HttpStatusCode } from '../common/constants';
 import { isNodeJSError } from '../common/utils';
 
 const execAsync = promisify(exec);
 
-const tryKillWin32 = async (pid: string | number): Promise<void> => {
+const tryKillTask = async (pid: string | number): Promise<void> => {
   try {
     await execAsync(`taskkill /f /pid ${pid}`);
   } catch {
@@ -23,7 +30,7 @@ export const killServer = async (port: number): Promise<void> => {
       const pids = [...new Set(matches)].map(Number).filter(Boolean);
 
       for (const pid of pids) {
-        await tryKillWin32(pid);
+        await tryKillTask(pid);
       }
     } else {
       await execAsync(`lsof -ti:${port} | xargs kill -9`);
@@ -33,7 +40,7 @@ export const killServer = async (port: number): Promise<void> => {
   }
 };
 
-type StartServerProps = {
+type startHttpServerProps = {
   port: number;
   hostname?: string;
   requestListener?: RequestListener;
@@ -42,15 +49,15 @@ type StartServerProps = {
   retryDelay?: number;
 };
 
-export const startServer = async (
+export const startHttpServer = async (
   {
     port,
-    hostname,
+    hostname = 'localhost',
     requestListener,
-    killExists,
-    connectionTimeout = 5_000,
+    killExists = true,
+    connectionTimeout = 10_000,
     retryDelay = 1_000,
-  }: StartServerProps,
+  }: startHttpServerProps,
   onStart?: () => void,
 ): Promise<Server> => {
   let elapsed = 0;
@@ -82,5 +89,33 @@ export const startServer = async (
       onStart?.();
     });
     server.listen(port, hostname);
+  });
+};
+
+export const redirectRequestToService = async (
+  req: IncomingMessage,
+  resp: ServerResponse,
+  port: number | string,
+  hostname: string = DEF_HOSTANME,
+): Promise<void> => {
+  await new Promise((resolve, reject) => {
+    const requestOptions: RequestOptions = {
+      hostname,
+      port,
+      path: req.url,
+      method: req.method,
+      headers: req.headers,
+    };
+    const serviceRequest = request(requestOptions, serviceResponse => {
+      serviceResponse.on('end', resolve);
+      serviceResponse.on('error', reject);
+      resp.writeHead(
+        serviceResponse.statusCode ?? HttpStatusCode.InternalServerError,
+        serviceResponse.headers,
+      );
+      serviceResponse.pipe(resp);
+    });
+    serviceRequest.on('error', reject);
+    req.pipe(serviceRequest);
   });
 };

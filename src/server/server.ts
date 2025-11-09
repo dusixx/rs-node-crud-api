@@ -3,14 +3,14 @@ import dotenv from 'dotenv';
 import { styleText as style } from 'node:util';
 import { DEF_SERVER_PORT } from '../common/constants';
 import { usersRouter } from '../router/usersRouter';
-import { startServer } from './server.utils';
+import { startHttpServer } from './server.utils';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const { BASE_PORT } = process.env;
-const port = Number(BASE_PORT || DEF_SERVER_PORT);
+const port = Number(BASE_PORT) || DEF_SERVER_PORT;
 const hostname = 'localhost';
 
-void startServer({ port, hostname, requestListener: usersRouter, killExists: true }, () => {
+void startHttpServer({ port, hostname, requestListener: usersRouter }, () => {
   console.log(style('cyan', `\n🚀 Server running at http://${hostname}:${port}\n`));
-});
+}).catch(console.log);
