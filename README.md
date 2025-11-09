@@ -1,6 +1,6 @@
 # Simple CRUD API
 
-A simple CRUD API application written in `Typescript`, that works with an `in-memory database`. It implements horizontal scaling using `Node.js ClusterAPI`. It runs multiple application instances, with a `load balancer` distributing requests between them (using the `Round Robin` algorithm).
+A simple CRUD API application written in `TypeScript`, that works with an `in-memory database`. It implements horizontal scaling using `Node.js ClusterAPI`. It runs multiple application instances, with a `load balancer` distributing requests between them (using the `Round Robin` algorithm).
 
 ## 🚀 Install
 
@@ -69,13 +69,11 @@ type UserUpdate = Partial<UserCreate>;
 
 #### Endpoints
 
-```sh
-GET /api/users — get array of all persons
-GET /api/users/{id} — get single person
-POST /api/users — create new person (UserCreate body required)
-PUT /api/users/{id} — update person data (UserUpdate body required)
-DELETE /api/users/{id} — delete person
-```
+- `GET /api/users` — get array of all persons
+- `GET /api/users/{id}` — get single person
+- `POST /api/users` — create new person (`UserCreate` body required)
+- `PUT /api/users/{id}` — update person data (`UserUpdate` body required)
+- `DELETE /api/users/{id}` — delete person
 
 ## 🆘 In case something goes wrong
 
