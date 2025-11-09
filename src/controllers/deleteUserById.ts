@@ -10,7 +10,6 @@ export const deleteUserById = (resp: ServerResponse, id: string): number => {
   if (!users.has(id)) {
     return sendJSON(resp, 'NotFound', { error: ErrorMessage.UserNotFound });
   }
-  const deleted = users.get(id);
   users.delete(id);
-  return sendJSON(resp, 'OK', deleted);
+  return sendJSON(resp, 'NoContent');
 };
