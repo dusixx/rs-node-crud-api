@@ -25,7 +25,7 @@ const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise
     case HttpMethod.DELETE:
       return id
         ? deleteUserById(resp, id)
-        : sendJSON(resp, 'BadRequest', { error: ErrorMessage.IDNorSpecified });
+        : sendJSON(resp, 'BadRequest', { error: ErrorMessage.IdNotSpecified });
 
     case HttpMethod.POST:
       return id
@@ -35,7 +35,7 @@ const _usersRouter = async (req: IncomingMessage, resp: ServerResponse): Promise
     case HttpMethod.PUT:
       return id
         ? await updateUserById(req, resp, id)
-        : sendJSON(resp, 'BadRequest', { error: ErrorMessage.IDNorSpecified });
+        : sendJSON(resp, 'BadRequest', { error: ErrorMessage.IdNotSpecified });
 
     default:
       return sendJSON(resp, 'MethodNotAllowed', { error: ErrorMessage.UnknownMethod });

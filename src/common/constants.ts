@@ -3,7 +3,7 @@ export const DEF_HOSTANME = 'localhost';
 export const ErrorMessage = {
   SomethingWrong: 'something went wrong',
   InvalidUUID: 'invalid ID',
-  IDNorSpecified: 'ID not specified',
+  IdNotSpecified: 'ID not specified',
   UserNotFound: 'user with such ID not found',
   UnknownRoute: 'unknown route',
   UnknownMethod: 'unknown method',
