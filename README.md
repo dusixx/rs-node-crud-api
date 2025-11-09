@@ -38,6 +38,8 @@ npm run start:prod
 
 ```sh
 npm run start:multi
+# or shorter
+npm run multi
 ```
 
 #### 🧪 Run tests
@@ -51,8 +53,8 @@ npm run coverage
 
 in clients like `Postman`, enter in the address bar
 
-- `http://localhost:4000/api/users/{id}`: single-threaded mode (port `4000`)
-- `http://localhost:4001/api/users/{id}`: multi-threaded mode (port `4001`)
+- `http://localhost:4000/api/users/{id}`: single-threaded mode (port **4000**)
+- `http://localhost:4001/api/users/{id}`: multi-threaded mode (port **4001**)
 
 #### User types (body)
 

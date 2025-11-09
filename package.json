@@ -9,6 +9,7 @@
     "start:prod": "npm run build && node dist/server/server.js",
     "start:multi": "nodemon --watch src --ext ts --exec ts-node src/server/balancer.ts",
     "start": "npm run start:dev",
+    "multi": "npm run start:multi",
     "test": "jest",
     "coverage": "jest --coverage",
     "prepare": "husky",

@@ -16,6 +16,4 @@ void startHttpServer({ port }, usersRouter)
     console.clear();
     console.log(cyan(`\n🚀 Server running at http://${hostname}[:${port}]\n`));
   })
-  .catch((err: unknown) => {
-    showError(err);
-  });
+  .catch(showError);
