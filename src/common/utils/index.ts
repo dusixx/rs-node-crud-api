@@ -1,5 +1,7 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import { ErrorMessage, HttpStatusCode } from '../constants';
+import type { RequestOptions } from 'node:http';
+import { request, type IncomingMessage, type ServerResponse } from 'node:http';
+import { DEF_HOSTANME, ErrorMessage, HttpStatusCode } from '../constants';
+import { red } from './style';
 
 export const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -32,13 +34,41 @@ export const getRequestBody = async (
 export const sendJSON = (
   resp: ServerResponse,
   statusCode: keyof typeof HttpStatusCode,
-  body: unknown,
+  body?: unknown,
 ): number => {
   const code = HttpStatusCode[statusCode];
   resp.writeHead(code, { 'content-type': 'application/json' });
   resp.end(JSON.stringify(body));
 
   return code;
+};
+
+export const redirectRequestToService = async (
+  req: IncomingMessage,
+  resp: ServerResponse,
+  port: number | string,
+  hostname: string = DEF_HOSTANME,
+): Promise<void> => {
+  await new Promise((resolve, reject) => {
+    const requestOptions: RequestOptions = {
+      hostname,
+      port,
+      path: req.url,
+      method: req.method,
+      headers: req.headers,
+    };
+    const serviceRequest = request(requestOptions, serviceResponse => {
+      serviceResponse.on('end', resolve);
+      serviceResponse.on('error', reject);
+      resp.writeHead(
+        serviceResponse.statusCode ?? HttpStatusCode.InternalServerError,
+        serviceResponse.headers,
+      );
+      serviceResponse.pipe(resp);
+    });
+    serviceRequest.on('error', reject);
+    req.pipe(serviceRequest);
+  });
 };
 
 export const JSONParse = (s: string): unknown => {
@@ -78,4 +108,8 @@ export const removeDups = <T>(arr: T[]): T[] => {
 
 export const isNodeJSError = (err: unknown): err is NodeJSError => {
   return err instanceof Error;
+};
+
+export const showError = (err: unknown): void => {
+  console.log(red('Error: '), getErrorMessage(err));
 };
