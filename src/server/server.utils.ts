@@ -49,17 +49,14 @@ type startHttpServerProps = {
   retryDelay?: number;
 };
 
-export const startHttpServer = async (
-  {
-    port,
-    hostname = 'localhost',
-    requestListener,
-    killExists = true,
-    connectionTimeout = 10_000,
-    retryDelay = 1_000,
-  }: startHttpServerProps,
-  onStart?: () => void,
-): Promise<Server> => {
+export const startHttpServer = async ({
+  port,
+  hostname = 'localhost',
+  requestListener,
+  killExists = true,
+  connectionTimeout = 10_000,
+  retryDelay = 1_000,
+}: startHttpServerProps): Promise<Server> => {
   let elapsed = 0;
   const server = http.createServer(requestListener);
 
@@ -86,7 +83,6 @@ export const startHttpServer = async (
     }
     server.on('listening', () => {
       resolve(server);
-      onStart?.();
     });
     server.listen(port, hostname);
   });
