@@ -3,7 +3,6 @@ import { exec } from 'node:child_process';
 import type { RequestListener, Server } from 'node:http';
 import http from 'node:http';
 import { promisify } from 'node:util';
-import { isNodeJSError } from '../common/utils';
 
 const execAsync = promisify(exec);
 
@@ -56,8 +55,8 @@ export const startHttpServer = async (
 
   return await new Promise((resolve, reject) => {
     if (killExists) {
-      server.on('error', async err => {
-        if (isNodeJSError(err) && err.code === 'EADDRINUSE') {
+      server.on('error', async (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
           console.log('⏳ Address in use, retrying...');
           await killServer(port);
 

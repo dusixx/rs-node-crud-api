@@ -1,18 +1,10 @@
+import console from 'node:console';
 import type { RequestOptions } from 'node:http';
 import { request, type IncomingMessage, type ServerResponse } from 'node:http';
 import { DEF_HOSTANME, ErrorMessage, HttpStatusCode } from '../constants';
 import { red } from './style';
 
 export const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-type NodeJSError = Error & {
-  errno?: number;
-  code?: string;
-  syscall?: string;
-  path?: string;
-  address?: string;
-  port?: number;
-};
 
 export const getRequestBody = async (
   req: IncomingMessage,
@@ -104,10 +96,6 @@ export const getErrorMessage = (
 
 export const removeDups = <T>(arr: T[]): T[] => {
   return [...new Set(arr)];
-};
-
-export const isNodeJSError = (err: unknown): err is NodeJSError => {
-  return err instanceof Error;
 };
 
 export const showError = (err: unknown): void => {
