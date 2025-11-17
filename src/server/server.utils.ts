@@ -33,7 +33,7 @@ export const killServer = async (port: number): Promise<void> => {
   }
 };
 
-type startHttpServerProps = {
+type StartHttpServerProps = {
   port: number;
   hostname?: string;
   killExists?: boolean;
@@ -48,7 +48,7 @@ export const startHttpServer = async (
     killExists = true,
     connectionTimeout = 10_000,
     retryDelay = 1_000,
-  }: startHttpServerProps,
+  }: StartHttpServerProps,
   requestListener?: RequestListener,
 ): Promise<Server> => {
   let elapsed = 0;
